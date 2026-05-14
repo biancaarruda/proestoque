@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { Colors, Typography, Spacing } from "@/src/constants/theme";
 
 type Props = {
@@ -15,10 +15,10 @@ export default function LogoProEstoque({ size = "lg" }: Props) {
 
   return (
     <View style={styles.container}>
-      <Ionicons
-        name="cube-outline"
-        size={sizes[size]}
-        color={Colors.primary[600]}
+      <FontAwesome6 
+        name="cubes" 
+        size={sizes[size]} 
+        color={Colors.primary[600]} 
       />
       <Text style={[styles.text, { fontSize: sizes[size] }]}>
         ProEstoque
@@ -31,7 +31,6 @@ const styles = StyleSheet.create({
   container: {
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: Spacing[6],
   },
   text: {
     color: Colors.primary[600],

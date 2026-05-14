@@ -1,5 +1,6 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import AntDesign from '@expo/vector-icons/AntDesign';
 import { Colors } from "@/src/constants/theme";
 
 export default function TabsLayout() {
@@ -19,7 +20,21 @@ export default function TabsLayout() {
           title: "Home",
           tabBarIcon: ({ size }) => (
             <Ionicons
-              name="cube-outline"
+              name="home"
+              size={size}
+              color={Colors.primary[600]}
+            />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="produtos"
+        options={{
+          title: "Produtos",
+          tabBarIcon: ({ size }) => (
+            <AntDesign
+              name="product"
               size={size}
               color={Colors.primary[600]}
             />
@@ -32,7 +47,7 @@ export default function TabsLayout() {
         options={{
           title: "Config",
           tabBarIcon: ({  size }) => (
-            <Ionicons name="settings-outline" 
+            <Ionicons name="settings" 
             size={size} 
             color={Colors.primary[600]} />
           ),

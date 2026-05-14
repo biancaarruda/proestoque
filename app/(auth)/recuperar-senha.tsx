@@ -7,7 +7,9 @@ import { useRouter } from "expo-router";
 import Input from "@/src/components/Input";
 import Button from "@/src/components/Button";
 import { Colors, Radius, Spacing, Typography } from "@/src/constants/theme";
-import { Ionicons } from "@expo/vector-icons";
+import AntDesign from '@expo/vector-icons/AntDesign';
+import Feather from '@expo/vector-icons/Feather';
+
 
 export default function RecuperarSenha() {
   const router = useRouter();
@@ -17,16 +19,22 @@ export default function RecuperarSenha() {
     <SafeAreaView style={styles.container}>
       
       <Pressable onPress={() => router.back()}>
-        <Text style={styles.back}>← Voltar</Text>
+        <Text style={styles.back}>
+          <Feather 
+          name="arrow-left" 
+          size={16}
+          color={Colors.primary[600]} /> 
+          Voltar</Text>
       </Pressable>
 
       <View style={styles.inner}>
-        <Ionicons
-          name="lock-closed-outline"
+        <AntDesign 
+          name="lock" 
           size={40}
           color={Colors.primary[600]}
           style={styles.lock}
         />
+
         <Text style={styles.title}>Recuperar senha</Text>
 
         <Text style={styles.desc}>
@@ -110,6 +118,7 @@ const styles = StyleSheet.create({
   desc: {
     marginBottom: Spacing[5],
     color: Colors.textSecondary,
+    fontSize: Typography.fontSize.base,
     textAlign: "center",
   },
 
