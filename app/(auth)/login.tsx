@@ -1,3 +1,7 @@
+import { useState } from "react";
+import { Alert } from "react-native";
+import { useAuth } from "@/src/contexts/AuthContext";
+
 import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -11,6 +15,21 @@ import LogoProEstoque from "@/src/components/LogoProEstoque";
 
 export default function Login() {
   const router = useRouter();
+  const { login, isLoading } = useAuth();
+
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+
+  async function handleLogin() {
+    try {
+      await login(email, senha);
+    } catch (error) {
+      Alert.alert(
+        "Erro",
+        "Preencha os campos."
+      );
+    }
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -26,12 +45,16 @@ export default function Login() {
           label="E-mail"
           placeholder="nome_usuario@email.com"
           leftIcon="mail-outline"
+          value={email}
+          onChangeText={setEmail}
         />
 
         <Input
           label="Senha"
           leftIcon="lock-closed-outline"
           isPassword
+          value={senha}
+          onChangeText={setSenha}
         />
 
         <Pressable onPress={() => router.push("/(auth)/recuperar-senha")}>
@@ -41,7 +64,8 @@ export default function Login() {
         <Button
           label="Entrar"
           fullWidth
-          onPress={() => router.replace("/(tabs)")}
+          loading={isLoading}
+          onPress={handleLogin}
         />
 
         <Pressable onPress={() => router.push("/(auth)/cadastro")}>

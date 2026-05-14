@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, StyleSheet,  ScrollView, Pressable } from "react-native";
+import { View, Text, StyleSheet,  ScrollView, Pressable, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useRouter } from "expo-router";
@@ -9,10 +9,13 @@ import Button from "@/src/components/Button";
 import { Colors, Spacing, Typography } from "@/src/constants/theme";
 
 import LogoProEstoque from "@/src/components/LogoProEstoque";
+import { useAuth } from "@/src/contexts/AuthContext";
 
 export default function Cadastro() {
   const router = useRouter();
-
+  const { register, isLoading } = useAuth();
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [confirmar, setConfirmar] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,13 +23,19 @@ export default function Cadastro() {
   const senhaErro =
     confirmar && senha !== confirmar ? "As senhas não coincidem" : "";
 
-  function handleCadastro() {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      router.replace("/(tabs)");
-    }, 2000);
+  async function handleCadastro() {
+
+  try {
+    await register(
+      nome, email, senha
+    );
+  } catch (error) {
+    Alert.alert(
+      "Erro",
+      "Preencha todos os campos"
+    );
   }
+}
 
   return (
     <SafeAreaView style={styles.container}>
@@ -35,12 +44,19 @@ export default function Cadastro() {
         
         <Text style={styles.title}>Criar conta</Text>
 
-        <Input label="Nome completo" placeholder="João Silva" />
+        <Input 
+          label="Nome completo" 
+          placeholder="João Silva"
+          value={nome}
+          onChangeText={setNome}
+        />
 
         <Input
           label="E-mail"
           placeholder="nome_usuario@email.com"
           leftIcon="mail-outline"
+          value={email}
+          onChangeText={setEmail}
         />
 
         <Input

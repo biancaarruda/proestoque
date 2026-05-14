@@ -1,4 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
+import { useAuth } from "@/src/contexts/AuthContext";
+
 import {
   View,
   Text,
@@ -26,6 +28,15 @@ import { Colors, Spacing, Typography, Radius } from "@/src/constants/theme";
 
 export default function HomeScreen() {
 
+  const { user } = useAuth();
+  const hora = new Date().getHours();
+
+  const saudacao =
+    hora < 12
+      ? "Bom dia"
+      : hora < 18
+        ? "Boa tarde"
+        : "Boa noite";
   const [refreshing, setRefreshing] = useState(false);
 
   const alertas = useMemo(
@@ -73,18 +84,31 @@ export default function HomeScreen() {
   const Header = () => (
     <View>
 
-      <Text style={styles.title}>
-        Olá, João {"! "}
-        <MaterialCommunityIcons
-          name="human-greeting-variant"
-          size={24}
-          color={Colors.primary[600]}
-        />
-      </Text>
+      <View style={styles.headerTop}>
 
-      <Text style={styles.subtitle}>
-        Visão geral do estoque
-      </Text>
+        <View>
+          <Text style={styles.title}>
+            {saudacao},{" "}
+            {user?.nome?.split(" ")[0]} {" "}
+            <MaterialCommunityIcons
+              name="human-greeting-variant"
+              size={24}
+              color={Colors.primary[600]}
+            />
+          </Text>
+
+          <Text style={styles.subtitle}>
+            Visão geral do estoque
+          </Text>
+        
+        </View>
+
+        <View style={styles.avatar}>
+          <Text style={styles.avatarText}>
+            {user?.nome?.charAt(0).toUpperCase()}
+          </Text>
+        </View>
+      </View>
 
       <View style={styles.cardsGrid}>
         {cardsResumo.map((card) => (
@@ -330,6 +354,28 @@ const styles = StyleSheet.create({
   alertQuantity: {
     fontWeight: Typography.fontWeight.bold,
     color: Colors.warning.text,
+  },
+
+  headerTop: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: Spacing[4],
+  },
+
+  avatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: Colors.primary[600],
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  avatarText: {
+    color: Colors.white,
+    fontSize: Typography.fontSize.lg,
+    fontWeight: Typography.fontWeight.bold,
   },
 
 });
