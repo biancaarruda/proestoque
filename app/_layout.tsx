@@ -12,6 +12,30 @@ import {
   AuthProvider,
   useAuth,
 } from "@/src/contexts/AuthContext";
+import { ProductsProvider } from "@/src/contexts/ProductsContext";
+
+function AppContent() {
+  const { isLoading } = useAuth();
+
+  if (isLoading) {
+    return <SplashScreen />;
+  }
+
+  return (
+    <>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(tabs)" />
+      </Stack>
+
+      <NavigationGuard />
+    </>
+  );
+}
 
 function NavigationGuard() {
   const {
@@ -57,16 +81,9 @@ function NavigationGuard() {
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-        }}
-      >
-        <Stack.Screen name="(auth)" />
-        <Stack.Screen name="(tabs)" />
-      </Stack>
-
-      <NavigationGuard />
+      <ProductsProvider>
+        <AppContent />
+      </ProductsProvider>
     </AuthProvider>
   );
 }

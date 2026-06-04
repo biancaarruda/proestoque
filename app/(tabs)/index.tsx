@@ -13,7 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-
+import { useProducts } from "@/src/contexts/ProductsContext";
 
 import {
   PRODUTOS_MOCK,
@@ -39,15 +39,24 @@ export default function HomeScreen() {
         : "Boa noite";
   const [refreshing, setRefreshing] = useState(false);
 
-  const alertas = useMemo(
-    () => getProdutosComEstoqueBaixo(),
-    []
-  );
+  const { produtos } = useProducts();
 
-  const valorTotal = useMemo(
-    () => getValorTotalEstoque(),
-    []
-  );
+const alertas = useMemo(
+  () =>
+    produtos.filter(
+      (p) => p.quantidade < p.quantidadeMinima
+    ),
+  [produtos]
+);
+
+const valorTotal = useMemo(
+  () =>
+    produtos.reduce(
+      (acc, p) => acc + p.quantidade * p.preco,
+      0
+    ),
+  [produtos]
+);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -58,7 +67,7 @@ export default function HomeScreen() {
     {
       id: "produtos",
       titulo: "Produtos",
-      valor: PRODUTOS_MOCK.length,
+      valor: produtos.length,
       icone: "cube",
     },
     {
@@ -226,7 +235,7 @@ export default function HomeScreen() {
 
       <FlatList<Produto>
 
-        data={PRODUTOS_MOCK}
+        data={[...produtos].slice(0, 5)}
 
         keyExtractor={(item) => item.id}
 

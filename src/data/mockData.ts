@@ -14,6 +14,7 @@ export type Produto = {
   quantidadeMinima: number;
   preco: number;
   unidade: string;
+  foto?: string;
 };
 
 export const CATEGORIAS_MOCK: Categoria[] = [

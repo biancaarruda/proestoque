@@ -39,9 +39,6 @@ export default function SplashScreen() {
 
             <LogoProEstoque size="lg" />
 
-            <Text style={styles.title}>
-                ProEstoque
-            </Text>
             <Text style={styles.subtitle}>
                 Carregando...
             </Text>

@@ -53,7 +53,7 @@ export default function Cadastro() {
 
         <Input
           label="E-mail"
-          placeholder="nome_usuario@email.com"
+          placeholder="usuario@email.com"
           leftIcon="mail-outline"
           value={email}
           onChangeText={setEmail}
