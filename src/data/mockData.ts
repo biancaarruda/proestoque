@@ -12,7 +12,7 @@ export type Produto = {
   categoriaId: string;
   quantidade: number;
   quantidadeMinima: number;
-  preco: number;
+  preco: string;
   unidade: string;
   foto?: string;
 };
@@ -30,7 +30,7 @@ export const PRODUTOS_MOCK: Produto[] = [
     categoriaId: "cat_1",
     quantidade: 4,
     quantidadeMinima: 10,
-    preco: 32.9,
+    preco: "32.90",
     unidade: "un",
   },
   {
@@ -39,7 +39,7 @@ export const PRODUTOS_MOCK: Produto[] = [
     categoriaId: "cat_1",
     quantidade: 48,
     quantidadeMinima: 24,
-    preco: 2.5,
+    preco: "2.50",
     unidade: "un",
   },
   {
@@ -48,7 +48,7 @@ export const PRODUTOS_MOCK: Produto[] = [
     categoriaId: "cat_2",
     quantidade: 15,
     quantidadeMinima: 5,
-    preco: 28,
+    preco: "28.00",
     unidade: "cx",
   },
   {
@@ -57,7 +57,7 @@ export const PRODUTOS_MOCK: Produto[] = [
     categoriaId: "cat_2",
     quantidade: 3,
     quantidadeMinima: 8,
-    preco: 9.5,
+    preco: "9.50",
     unidade: "un",
   },
   {
@@ -66,7 +66,7 @@ export const PRODUTOS_MOCK: Produto[] = [
     categoriaId: "cat_3",
     quantidade: 0,
     quantidadeMinima: 4,
-    preco: 24.9,
+    preco: "24.90",
     unidade: "cx",
   },
     {
@@ -75,7 +75,7 @@ export const PRODUTOS_MOCK: Produto[] = [
     categoriaId: "cat_1",
     quantidade: 20,
     quantidadeMinima: 12,
-    preco: 8.99,
+    preco: "8.99",
     unidade: "un",
   },
   {
@@ -84,7 +84,7 @@ export const PRODUTOS_MOCK: Produto[] = [
     categoriaId: "cat_2",
     quantidade: 10,
     quantidadeMinima: 6,
-    preco: 4.5,
+    preco: "4.50",
     unidade: "un",
   },
   {
@@ -93,7 +93,7 @@ export const PRODUTOS_MOCK: Produto[] = [
     categoriaId: "cat_2",
     quantidade: 2,
     quantidadeMinima: 5,
-    preco: 7.8,
+    preco: "7.80",
     unidade: "un",
   },
   {
@@ -102,7 +102,7 @@ export const PRODUTOS_MOCK: Produto[] = [
     categoriaId: "cat_3",
     quantidade: 12,
     quantidadeMinima: 6,
-    preco: 2.2,
+    preco: "2.20",
     unidade: "un",
   },
   {
@@ -111,7 +111,7 @@ export const PRODUTOS_MOCK: Produto[] = [
     categoriaId: "cat_3",
     quantidade: 1,
     quantidadeMinima: 3,
-    preco: 5.9,
+    preco: "5.90",
     unidade: "un",
   },
 
@@ -125,7 +125,7 @@ export const getProdutosComEstoqueBaixo = () =>
 
 export const getValorTotalEstoque = () =>
   PRODUTOS_MOCK.reduce(
-    (acc, p) => acc + p.quantidade * p.preco,
+    (acc, p) => acc + p.quantidade * parseFloat(p.preco),
     0
   );
 

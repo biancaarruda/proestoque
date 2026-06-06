@@ -7,6 +7,7 @@ import {
 } from "react";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { api } from "@/src/services/api";
 
 type User = {
     id: string;
@@ -26,8 +27,8 @@ type AuthContextType = {
 
 const STORAGE_KEYS = {
     TOKEN: "@proestoque:token",
+    REFRESH_TOKEN: "@proestoque:refreshToken",
     USER: "@proestoque:user",
-    USERS: "@proestoque:users",
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -83,52 +84,38 @@ export function AuthProvider({
     }, []);
 
     const login = useCallback(
-        async (
-            email: string,
-            senha: string
-        ) => {
+        async (email: string, senha: string) => {
             setIsLoading(true);
+
             try {
-                await new Promise((resolve) =>
-                    setTimeout(resolve, 500)
+                const response = await api.post(
+                    "/auth/login",
+                    {
+                        email,
+                        senha,
+                    }
                 );
 
-                if (!email || !senha) {
-                    throw new Error("Preencha os campos");
-                }
-
-                const usuariosSalvos =
-                    await AsyncStorage.getItem(
-                        STORAGE_KEYS.USERS
-                    );
-
-                const usuarios = usuariosSalvos
-                    ? JSON.parse(usuariosSalvos)
-                    : [];
-
-                const usuarioEncontrado = usuarios.find(
-                    (u: any) =>
-                        u.email === email &&
-                        u.senha === senha
-                );
-
-                if (!usuarioEncontrado) {
-                    throw new Error("Usuário não encontrado");
-                }
-
-                const tokenSimulado =
-                    "token_" + Date.now();
+                const {
+                    usuario,
+                    token,
+                    refreshToken,
+                } = response.data;
 
                 await AsyncStorage.multiSet([
-                    [STORAGE_KEYS.TOKEN, tokenSimulado],
+                    [STORAGE_KEYS.TOKEN, token],
+                    [
+                        STORAGE_KEYS.REFRESH_TOKEN,
+                        refreshToken,
+                    ],
                     [
                         STORAGE_KEYS.USER,
-                        JSON.stringify(usuarioEncontrado),
+                        JSON.stringify(usuario),
                     ],
                 ]);
 
-                setToken(tokenSimulado);
-                setUser(usuarioEncontrado);
+                setToken(token);
+                setUser(usuario);
 
             } finally {
                 setIsLoading(false);
@@ -144,51 +131,37 @@ export function AuthProvider({
             senha: string
         ) => {
             setIsLoading(true);
+
             try {
-                await new Promise((resolve) =>
-                    setTimeout(resolve, 500)
+                const response = await api.post(
+                    "/auth/registro",
+                    {
+                        nome,
+                        email,
+                        senha,
+                    }
                 );
 
-                if (!nome || !email || !senha) {
-                    throw new Error("Preencha todos os campos");
-                }
-
-                const usuariosSalvos =
-                    await AsyncStorage.getItem(
-                        STORAGE_KEYS.USERS
-                    );
-
-                const usuarios = usuariosSalvos
-                    ? JSON.parse(usuariosSalvos)
-                    : [];
-
-                const novoUsuario = {
-                    id: "user_" + Date.now(),
-                    nome,
-                    email,
-                    senha,
-                };
-
-                usuarios.push(novoUsuario);
-
-                await AsyncStorage.setItem(
-                    STORAGE_KEYS.USERS,
-                    JSON.stringify(usuarios)
-                );
-
-                const tokenSimulado =
-                    "token_" + Date.now();
+                const {
+                    usuario,
+                    token,
+                    refreshToken,
+                } = response.data;
 
                 await AsyncStorage.multiSet([
-                    [STORAGE_KEYS.TOKEN, tokenSimulado],
+                    [STORAGE_KEYS.TOKEN, token],
+                    [
+                        STORAGE_KEYS.REFRESH_TOKEN,
+                        refreshToken,
+                    ],
                     [
                         STORAGE_KEYS.USER,
-                        JSON.stringify(novoUsuario),
+                        JSON.stringify(usuario),
                     ],
                 ]);
 
-                setToken(tokenSimulado);
-                setUser(novoUsuario);
+                setToken(token);
+                setUser(usuario);
 
             } finally {
                 setIsLoading(false);
@@ -200,6 +173,7 @@ export function AuthProvider({
     const logout = useCallback(async () => {
         await AsyncStorage.multiRemove([
             STORAGE_KEYS.TOKEN,
+            STORAGE_KEYS.REFRESH_TOKEN,
             STORAGE_KEYS.USER,
         ]);
 
