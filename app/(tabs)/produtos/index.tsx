@@ -21,20 +21,23 @@ import {
   Typography,
 } from "@/src/constants/theme";
 
-import {
-  CATEGORIAS_MOCK,
-  type Produto,
-} from "@/src/data/mockData";
+import { Produto } from "@/src/data/mockData";
+import { useCategorias } from "@/src/hooks/useCategorias";
 
 import { useProducts } from "@/src/contexts/ProductsContext";
+import LoadingView from "@/src/components/LoadingView";
 
+import ErrorView from "@/src/components/ErrorView";
+
+import { RefreshControl, } from "react-native";
 export default function ProdutosScreen() {
   const router = useRouter();
 
-  const { produtos } = useProducts();
+  const { produtos, isLoading, error, carregarProdutos } = useProducts();
 
   const [busca, setBusca] = useState("");
-
+  const { categorias } = useCategorias();
+  const [refreshing, setRefreshing] = useState(false);
   const [
     categoriaSelecionada,
     setCategoriaSelecionada,
@@ -64,7 +67,15 @@ export default function ProdutosScreen() {
   const [modoGrid, setModoGrid] =
     useState(false);
 
+async function onRefresh() {
 
+  setRefreshing(true);
+
+  await carregarProdutos();
+
+  setRefreshing(false);
+
+}
 
   function renderProduto({
     item,
@@ -141,6 +152,18 @@ export default function ProdutosScreen() {
       </Pressable>
     );
   }
+  if (isLoading) {
+  return <LoadingView />;
+}
+
+if (error) {
+  return (
+    <ErrorView
+      message={error}
+      onRetry={carregarProdutos}
+    />
+  );
+}
 
   return (
     <View style={styles.container}>
@@ -202,7 +225,7 @@ export default function ProdutosScreen() {
           </Text>
         </Pressable>
 
-        {CATEGORIAS_MOCK.map(
+        {categorias.map(
           (categoria) => (
             <Pressable
               key={categoria.id}
@@ -241,12 +264,18 @@ export default function ProdutosScreen() {
         keyExtractor={(item) => item.id}
         renderItem={renderProduto}
         showsVerticalScrollIndicator={false}
+        
         ListEmptyComponent={
           <Text>
             Nenhum produto encontrado
           </Text>
         }
-      />
+      refreshControl={
+  <RefreshControl
+    refreshing={refreshing}
+    onRefresh={onRefresh}
+  />
+}/>
 
       <Pressable
         style={styles.fab}

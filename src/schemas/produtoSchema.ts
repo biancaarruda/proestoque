@@ -17,9 +17,7 @@ export const produtoSchema = z.object({
     .number()
     .min(0, "Quantidade mínima inválida"),
 
-  preco: z
-    .string()
-    .min(1, "Preço obritatório"),
+  preco: z.number().min(0, "Preço inválido"),
 
   unidade: z
     .string()

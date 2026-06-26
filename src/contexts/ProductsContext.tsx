@@ -3,29 +3,38 @@ import {
   useContext,
   useEffect,
   useReducer,
+  useState,
 } from "react";
-
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import { useAuth } from "./AuthContext";
 import {
-  Produto,
-  PRODUTOS_MOCK,
-} from "@/src/data/mockData";
+  listarProdutos,
+  criarProduto,
+  atualizarProduto,
+  excluirProduto as deleteProduto,
+} from "@/src/services/produtos";
+import { Produto } from "../data/mockData";
+import axios from "axios";
 
 type ProductsContextType = {
   produtos: Produto[];
 
+  isLoading: boolean;
+
+  error: string | null;
+
+  carregarProdutos: () => Promise<void>;
+
   adicionarProduto: (
     produto: Omit<Produto, "id">
-  ) => void;
+  ) => Promise<void>;
 
   editarProduto: (
     produto: Produto
-  ) => void;
+  ) => Promise<void>;
 
   excluirProduto: (
     id: string
-  ) => void;
+  ) => Promise<void>;
 };
 
 type State = {
@@ -34,24 +43,21 @@ type State = {
 
 type Action =
   | {
-      type: "LOAD";
-      payload: Produto[];
-    }
+    type: "LOAD";
+    payload: Produto[];
+  }
   | {
-      type: "ADD";
-      payload: Produto;
-    }
+    type: "ADD";
+    payload: Produto;
+  }
   | {
-      type: "UPDATE";
-      payload: Produto;
-    }
+    type: "UPDATE";
+    payload: Produto;
+  }
   | {
-      type: "DELETE";
-      payload: string;
-    };
-
-const STORAGE_KEY =
-  "@proestoque:produtos";
+    type: "DELETE";
+    payload: string;
+  };
 
 const ProductsContext =
   createContext<ProductsContextType | null>(
@@ -110,73 +116,82 @@ export function ProductsProvider({
       produtos: [],
     }
   );
+  const [isLoading, setIsLoading] =
+    useState(false);
 
-  useEffect(() => {
-    carregarProdutos();
-  }, []);
+  const [error, setError] =
+    useState<string | null>(null);
 
+  const { isAuthenticated } = useAuth();
   useEffect(() => {
-    salvarProdutos();
-  }, [state.produtos]);
+    if (isAuthenticated) {
+      carregarProdutos();
+    }
+  }, [isAuthenticated]);
 
   async function carregarProdutos() {
-    try {
-      const dados =
-        await AsyncStorage.getItem(
-          STORAGE_KEY
-        );
+  try {
+    setIsLoading(true);
+    setError(null);
 
-      if (dados) {
-        dispatch({
-          type: "LOAD",
-          payload: JSON.parse(dados),
-        });
+    const produtos = await listarProdutos();
+
+    dispatch({
+      type: "LOAD",
+      payload: produtos,
+    });
+
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      if (!error.response) {
+        setError("Erro de conexão");
       } else {
-        dispatch({
-          type: "LOAD",
-          payload: PRODUTOS_MOCK,
-        });
+        setError(
+          error.response.data?.erro ??
+          "Algo deu errado"
+        );
       }
-    } catch (error) {
-      console.log(error);
+    } else {
+      setError("Algo deu errado");
     }
-  }
 
-  async function salvarProdutos() {
-    try {
-      await AsyncStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(state.produtos)
-      );
-    } catch (error) {
-      console.log(error);
-    }
+  } finally {
+    setIsLoading(false);
   }
+}
 
-  function adicionarProduto(
-    produto: Omit<Produto, "id">
+  async function adicionarProduto(
+    produto: any
   ) {
+    const novoProduto =
+      await criarProduto(produto);
+
     dispatch({
       type: "ADD",
-      payload: {
-        ...produto,
-        id: Date.now().toString(),
-      },
+      payload: novoProduto,
     });
   }
 
-  function editarProduto(
-    produto: Produto
+  async function editarProduto(
+    produto: any
   ) {
+    const atualizado =
+      await atualizarProduto(
+        produto.id,
+        produto
+      );
+
     dispatch({
       type: "UPDATE",
-      payload: produto,
+      payload: atualizado,
     });
   }
 
-  function excluirProduto(
+  async function excluirProduto(
     id: string
   ) {
+    await deleteProduto(id);
+
     dispatch({
       type: "DELETE",
       payload: id,
@@ -187,6 +202,9 @@ export function ProductsProvider({
     <ProductsContext.Provider
       value={{
         produtos: state.produtos,
+        isLoading,
+        error,
+        carregarProdutos,
         adicionarProduto,
         editarProduto,
         excluirProduto,

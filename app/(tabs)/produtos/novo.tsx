@@ -12,10 +12,9 @@ export default function NovoProduto() {
   const { adicionarProduto } =
     useProducts();
 
-  function handleCreate(
+  async function handleCreate(
     data: ProdutoFormData
-  ) {
-    adicionarProduto(data);
+  ) { await adicionarProduto(data);
 
     router.back();
   }

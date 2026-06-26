@@ -4,7 +4,6 @@ import {
   useLocalSearchParams,
   useRouter,
 } from "expo-router";
-
 import Button from "@/src/components/Button";
 
 import ProductForm from "@/src/components/ProductForm";
@@ -41,11 +40,12 @@ export default function EditarProduto() {
 
   const produtoSelecionado = produto;
 
-  function handleUpdate(
+  async function handleUpdate(
     data: ProdutoFormData
   ) {
-    editarProduto({
-      ...produtoSelecionado,
+    await editarProduto({
+      //...produtoSelecionado,
+      id:produtoSelecionado.id,
       ...data,
     });
 
@@ -66,10 +66,10 @@ export default function EditarProduto() {
           text: "Excluir",
           style: "destructive",
 
-          onPress: () => {
+          onPress: async () => {
             if (!produtoSelecionado) return;
 
-            excluirProduto(
+            await excluirProduto(
               produtoSelecionado.id
             );
 
@@ -95,11 +95,19 @@ export default function EditarProduto() {
         }}
       >
         <Button
+          label="Movimentações"
+          fullWidth
+          onPress={() =>
+            router.push(`/produtos/movimentacoes/${produto.id}`)
+          }
+        />
+        <Button
           label="Excluir produto"
           variant="danger"
           fullWidth
           onPress={handleDelete}
         />
+
       </View>
     </View>
   );

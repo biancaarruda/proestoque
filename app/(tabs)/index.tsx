@@ -14,21 +14,15 @@ import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useProducts } from "@/src/contexts/ProductsContext";
-
-import {
-  PRODUTOS_MOCK,
-  CATEGORIAS_MOCK,
-  getProdutosComEstoqueBaixo,
-  getValorTotalEstoque,
-  formatarPreco,
-  type Produto,
-} from "@/src/data/mockData";
-
+import { Produto } from "@/src/data/mockData";
 import { Colors, Spacing, Typography, Radius } from "@/src/constants/theme";
+import {useCategorias} from "@/src/hooks/useCategorias";
+import { formatarPreco } from "@/src/utils/formatters";
 
 export default function HomeScreen() {
 
   const { user } = useAuth();
+  const { categorias } = useCategorias();
   const hora = new Date().getHours();
 
   const saudacao =
@@ -39,7 +33,7 @@ export default function HomeScreen() {
         : "Boa noite";
   const [refreshing, setRefreshing] = useState(false);
 
-  const { produtos } = useProducts();
+  const { produtos,carregarProdutos } = useProducts();
 
 const alertas = useMemo(
   () =>
@@ -52,16 +46,23 @@ const alertas = useMemo(
 const valorTotal = useMemo(
   () =>
     produtos.reduce(
-      (acc, p) => acc + p.quantidade * p.preco,
+      (acc, p) =>
+        acc + p.quantidade * p.preco,
       0
     ),
   [produtos]
 );
 
-  const onRefresh = useCallback(() => {
+  const onRefresh =
+  useCallback(async () => {
+
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1500);
-  }, []);
+
+    await carregarProdutos();
+
+    setRefreshing(false);
+
+  }, [carregarProdutos]);
 
   const cardsResumo = [
     {
@@ -79,7 +80,7 @@ const valorTotal = useMemo(
     {
       id: "categorias",
       titulo: "Categorias",
-      valor: CATEGORIAS_MOCK.length,
+      valor: categorias.length,
       icone: "grid",
     },
     {

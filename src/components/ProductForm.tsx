@@ -11,9 +11,7 @@ import Input from "@/src/components/Input";
 import Button from "@/src/components/Button";
 import ImagePickerField from "@/src/components/ImagePickerField";
 import { Picker } from "@react-native-picker/picker";
-import {
-  CATEGORIAS_MOCK,
-} from "@/src/data/mockData";
+import {useCategorias} from "@/src/hooks/useCategorias";
 import {
   produtoSchema,
   ProdutoFormData,
@@ -34,6 +32,8 @@ export default function ProductForm({
   onSubmit,
   submitLabel,
 }: Props) {
+  const { categorias } = useCategorias();
+
   const {
     control,
     handleSubmit,
@@ -45,7 +45,7 @@ export default function ProductForm({
       categoriaId: "",
       quantidade: 0,
       quantidadeMinima: 0,
-      preco: "",
+      preco: 0,
       unidade: "",
       foto: "",
     },
@@ -116,7 +116,7 @@ export default function ProductForm({
                 value=""
               />
 
-              {CATEGORIAS_MOCK.map((categoria) => (
+              {categorias.map((categoria) => (
                 <Picker.Item
                   key={categoria.id}
                   label={categoria.nome}
@@ -202,8 +202,10 @@ export default function ProductForm({
           <Input
             label="Preço"
             keyboardType="decimal-pad"
-            value={value}
-            onChangeText={onChange}
+            value={String(value)}
+            onChangeText={(text) =>
+              onChange(Number(text.replace(",", ".")))
+            } 
             error={error?.message}
           />
         )}

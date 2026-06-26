@@ -42,7 +42,7 @@ export function AuthProvider({
     const [token, setToken] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
+    useEffect(() => { 
         async function carregarSessao() {
             const inicio = Date.now();
             try {

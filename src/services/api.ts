@@ -1,12 +1,12 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Constants from "expo-constants";
 
-const BASE_URL = __DEV__
-  ? "http://192.168.1.21:3333/api"
-  : "https://minha-api.com/api";
+const API_URL =
+  Constants.expoConfig?.extra?.apiUrl;
 
 export const api = axios.create({
-  baseURL: BASE_URL,
+  baseURL: API_URL,
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
@@ -15,7 +15,7 @@ export const api = axios.create({
 
 api.interceptors.request.use(async (config) => {
   const token = await AsyncStorage.getItem("@proestoque:token");
-
+  
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -26,6 +26,7 @@ api.interceptors.request.use(async (config) => {
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
+    
     const originalRequest = error.config;
 
     if (
@@ -50,9 +51,7 @@ api.interceptors.response.use(
             refreshToken,
           }
         );
-
-        const novoToken =
-          response.data.token;
+        const novoToken = response.data.token;
 
         await AsyncStorage.setItem(
           "@proestoque:token",
@@ -61,7 +60,6 @@ api.interceptors.response.use(
 
         originalRequest.headers.Authorization =
           `Bearer ${novoToken}`;
-
         return api(originalRequest);
 
       } catch (err: any) {
