@@ -15,6 +15,11 @@ import {
 import { Produto } from "../data/mockData";
 import axios from "axios";
 
+import {
+  notificarEstoqueCritico,
+  limparBadge,
+} from "@/src/services/notifications";
+
 type ProductsContextType = {
   produtos: Produto[];
 
@@ -141,6 +146,20 @@ export function ProductsProvider({
       payload: produtos,
     });
 
+    const criticos = produtos.filter(
+  (produto) =>
+    produto.quantidade <
+    produto.quantidadeMinima
+);
+
+if (criticos.length > 0) {
+  await notificarEstoqueCritico(
+    criticos
+  );
+} else {
+  await limparBadge();
+}
+
   } catch (error) {
     if (axios.isAxiosError(error)) {
       if (!error.response) {
@@ -161,7 +180,7 @@ export function ProductsProvider({
 }
 
   async function adicionarProduto(
-    produto: any
+    produto: Omit<Produto, "id">
   ) {
     const novoProduto =
       await criarProduto(produto);
@@ -173,7 +192,7 @@ export function ProductsProvider({
   }
 
   async function editarProduto(
-    produto: any
+    produto: Produto
   ) {
     const atualizado =
       await atualizarProduto(

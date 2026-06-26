@@ -11,7 +11,7 @@ import {
 } from "react-native";
 
 import { useRouter } from "expo-router";
-
+import { ProdutoListaSkeleton } from "@/src/components/ProdutoSkeleton";
 import { Ionicons } from "@expo/vector-icons";
 
 import {
@@ -152,8 +152,16 @@ async function onRefresh() {
       </Pressable>
     );
   }
-  if (isLoading) {
+  /*if (isLoading) {
   return <LoadingView />;
+}*/
+
+  if (isLoading && produtos.length === 0) {
+  return (
+    <View style={styles.container}>
+      <ProdutoListaSkeleton count={6} />
+    </View>
+  );
 }
 
 if (error) {

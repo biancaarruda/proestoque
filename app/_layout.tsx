@@ -14,6 +14,11 @@ import {
 } from "@/src/contexts/AuthContext";
 import { ProductsProvider } from "@/src/contexts/ProductsContext";
 
+import {
+  solicitarPermissaoNotificacoes,
+  agendarVerificacaoDiaria,
+} from "@/src/services/notifications";
+
 function AppContent() {
   const { isLoading } = useAuth();
 
@@ -70,6 +75,21 @@ function NavigationGuard() {
     isLoading,
     segments,
   ]);
+
+  useEffect(() => {
+  async function configurar() {
+    const permitido =
+      await solicitarPermissaoNotificacoes();
+
+    if (permitido) {
+      await agendarVerificacaoDiaria();
+    }
+  }
+
+  if (isAuthenticated) {
+    configurar();
+  }
+}, [isAuthenticated]);
 
   if (isLoading) {
     return <SplashScreen />;
